@@ -4,13 +4,12 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { Provider } from 'react-redux';
-import store from './store';
+import AppContextProvider from './context/AppContext';
 
 createRoot(document.getElementById('root')).render(
-    <Provider store={store}>
+    <AppContextProvider>
         <App />
-    </Provider>,
+    </AppContextProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -1,5 +1,4 @@
-import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useContext } from 'react';
 
 import { CSidebar, CSidebarBrand, CSidebarNav, CSidebarToggler } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
@@ -14,11 +13,15 @@ import 'simplebar/dist/simplebar.min.css';
 
 // sidebar nav config
 import navigation from '../_nav';
+import { AppContext } from '../context/AppContext';
+import immutableSetState from '../context/immutableSetState';
 
 const AppSidebar = () => {
-    const dispatch = useDispatch();
-    const unfoldable = useSelector((state) => state.sidebarUnfoldable);
-    const sidebarShow = useSelector((state) => state.sidebarShow);
+
+    const { appState } = useContext(AppContext);
+
+    const { sideBar } = appState;
+    const { sidebarShow, unfoldable } = sideBar;
 
     return (
         <CSidebar
@@ -26,7 +29,9 @@ const AppSidebar = () => {
             unfoldable={unfoldable}
             visible={sidebarShow}
             onVisibleChange={(visible) => {
-                dispatch({ type: 'set', sidebarShow: visible });
+                immutableSetState((draft) => {
+                    draft.sideBar.sidebarShow = visible;
+                });
             }}
         >
             <CSidebarBrand className="d-none d-md-flex" to="/">
@@ -40,7 +45,11 @@ const AppSidebar = () => {
             </CSidebarNav>
             <CSidebarToggler
                 className="d-none d-lg-flex"
-                onClick={() => dispatch({ type: 'set', sidebarUnfoldable: !unfoldable })}
+                onClick={() => {
+                    immutableSetState((draft) => {
+                        draft.sideBar.unfoldable = !draft.sideBar.unfoldable;
+                    });
+                }}
             />
         </CSidebar>
     );

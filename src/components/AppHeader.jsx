@@ -1,6 +1,5 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
 import {
     CContainer,
     CHeader,
@@ -17,17 +16,20 @@ import { cilBell, cilEnvelopeOpen, cilList, cilMenu } from '@coreui/icons';
 import { AppBreadcrumb } from './index';
 import { AppHeaderDropdown } from './header/index';
 import { logo } from '../assets/brand/logo';
+import immutableSetState from '../context/immutableSetState';
 
 const AppHeader = () => {
-    const dispatch = useDispatch();
-    const sidebarShow = useSelector((state) => state.sidebarShow);
 
     return (
         <CHeader position="sticky" className="mb-4">
             <CContainer fluid>
                 <CHeaderToggler
                     className="ps-1"
-                    onClick={() => dispatch({ type: 'set', sidebarShow: !sidebarShow })}
+                    onClick={() => {
+                        immutableSetState((draft) => {
+                            draft.sideBar.sidebarShow = !draft.sideBar.sidebarShow;
+                        });
+                    }}
                 >
                     <CIcon icon={cilMenu} size="lg" />
                 </CHeaderToggler>
@@ -37,7 +39,7 @@ const AppHeader = () => {
                 <CHeaderNav className="d-none d-md-flex me-auto">
                     <CNavItem>
                         <CNavLink to="/dashboard" component={NavLink}>
-              Dashboard
+                            Dashboard
                         </CNavLink>
                     </CNavItem>
                     <CNavItem>
