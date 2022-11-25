@@ -38,14 +38,14 @@ services:
       rollback_config:
         parallelism: 0
         order: stop-first
-      command:
-        - /bin/bash
-        - -c
-        - |
-          ./node_modules/http-server/bin/http-server \
-          ./build/ \
-          --proxy http://localhost:${APP_PORT}\? \
-          -p ${APP_PORT}
+    command:
+      - /bin/bash
+      - -c
+      - |
+        ./node_modules/http-server/bin/http-server \
+        ./build/ \
+        --proxy http://localhost:${APP_PORT}\? \
+        -p ${APP_PORT}
     # healthcheck:
     #   test: ["CMD", "./healthCheck.sh", "${APP_PORT}"]
 
