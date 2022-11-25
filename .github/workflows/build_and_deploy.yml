@@ -19,28 +19,28 @@ jobs:
           echo "APP_VERSION=$(node printVersion.js)" >> $GITHUB_ENV
           echo "REPO_NAME=$(echo ${GITHUB_REPOSITORY#*/})" >> $GITHUB_ENV
           echo "BRANCH_NAME=$(echo $GITHUB_REF | awk -F / '{print $3}')" >> $GITHUB_ENV
-      # - name: assign port for prd
-      #   if: ${{env.BRANCH_NAME == 'prd'}}
-      #   run: |
-      #     echo "APP_PORT=8401" >> $GITHUB_ENV
-      # - name: assign port for dev
-      #   if: ${{env.BRANCH_NAME == 'dev'}}
-      #   run: |
-      #     echo "APP_PORT=8402" >> $GITHUB_ENV
-      # - name: assign port for test
-      #   if: ${{env.BRANCH_NAME == 'test'}}
-      #   run: |
-      #     echo "APP_PORT=8403" >> $GITHUB_ENV
-      # - name: Prepare APP_DOMAIN
-      #   run: |
-      #     echo "APP_DOMAIN=$( echo ${{ env.BRANCH_NAME }}).api.codevteacher.com" >> $GITHUB_ENV
-      # - name: print environments
-      #   run: |
-      #     echo "${{ env.APP_VERSION }}"
-      #     echo "${{ env.REPO_NAME }}"
-      #     echo "${{ env.BRANCH_NAME }}"
-      #     echo "${{ env.APP_PORT }}"
-      #     echo "${{ env.APP_DOMAIN }}"
+      - name: assign port for prd
+        if: ${{env.BRANCH_NAME == 'prd'}}
+        run: |
+          echo "APP_PORT=3101" >> $GITHUB_ENV
+      - name: assign port for dev
+        if: ${{env.BRANCH_NAME == 'dev'}}
+        run: |
+          echo "APP_PORT=3102" >> $GITHUB_ENV
+      - name: assign port for test
+        if: ${{env.BRANCH_NAME == 'test'}}
+        run: |
+          echo "APP_PORT=3103" >> $GITHUB_ENV
+      - name: Prepare APP_DOMAIN
+        run: |
+          echo "APP_DOMAIN=$( echo ${{ env.BRANCH_NAME }}).admin.codevteacher.com" >> $GITHUB_ENV
+      - name: print environments
+        run: |
+          echo "${{ env.APP_VERSION }}"
+          echo "${{ env.REPO_NAME }}"
+          echo "${{ env.BRANCH_NAME }}"
+          echo "${{ env.APP_PORT }}"
+          echo "${{ env.APP_DOMAIN }}"
       # - name: Login to Docker Hub
       #   uses: docker/login-action@v2
       #   with:
