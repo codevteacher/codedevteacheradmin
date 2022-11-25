@@ -1,6 +1,6 @@
 {
   "name": "codedevteacheradmin",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "description": "CoDevTeacher Admin Dashboard",
   "license": "MIT",
   "author": "Jason Jafari (https://www.linkedin.com/in/jasonjafari/)",
@@ -12,7 +12,16 @@
     "start": "react-scripts start",
     "test": "react-scripts test",
     "test:cov": "npm test -- --coverage --watchAll=false",
-    "test:debug": "react-scripts --inspect-brk test --runInBand"
+    "test:debug": "react-scripts --inspect-brk test --runInBand",
+    "audit": "better-npm-audit audit -l moderate 1002401",
+    "increase-version": "npm --force --no-git-tag-version version patch && git add package.json package-lock.json",
+    "lint:check": "eslint -c .eslintrc.js --color .",
+    "postmerge": "ls -la",
+    "precommit": "npm run increase-version",
+    "prepush": "npm run verify",
+    "prebuild": "rimraf dist",
+    "prepare": "husky install",
+    "verify": "npm run lint:check"
   },
   "dependencies": {
     "@coreui/chartjs": "^3.0.0",
@@ -41,6 +50,7 @@
     "auto-changelog": "~2.4.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "husky": "^8.0.2",
     "prettier": "2.7.1",
     "react-scripts": "5.0.1",
     "sass": "^1.54.4",
