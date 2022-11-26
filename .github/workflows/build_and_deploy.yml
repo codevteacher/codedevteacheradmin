@@ -1,0 +1,87 @@
+name: build and deploy
+
+on:
+  push:
+    branches:
+      - prd
+      - dev
+      - test
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Prepare environment (APP_VERSION, REPO_NAME, BRANCH_NAME)
+        run: |
+          echo "APP_VERSION=$(node printVersion.js)" >> $GITHUB_ENV
+          echo "REPO_NAME=$(echo ${GITHUB_REPOSITORY#*/})" >> $GITHUB_ENV
+          echo "BRANCH_NAME=$(echo $GITHUB_REF | awk -F / '{print $3}')" >> $GITHUB_ENV
+      - name: assign port for prd
+        if: ${{env.BRANCH_NAME == 'prd'}}
+        run: |
+          echo "APP_PORT=3101" >> $GITHUB_ENV
+      - name: assign port for dev
+        if: ${{env.BRANCH_NAME == 'dev'}}
+        run: |
+          echo "APP_PORT=3102" >> $GITHUB_ENV
+      - name: assign port for test
+        if: ${{env.BRANCH_NAME == 'test'}}
+        run: |
+          echo "APP_PORT=3103" >> $GITHUB_ENV
+      - name: Prepare APP_DOMAIN
+        run: |
+          echo "APP_DOMAIN=$( echo ${{ env.BRANCH_NAME }}).admin.codevteacher.com" >> $GITHUB_ENV
+      - name: print environments
+        run: |
+          echo "${{ env.APP_VERSION }}"
+          echo "${{ env.REPO_NAME }}"
+          echo "${{ env.BRANCH_NAME }}"
+          echo "${{ env.APP_PORT }}"
+          echo "${{ env.APP_DOMAIN }}"
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: |
+            jafarijason/${{env.REPO_NAME}}_${{ env.BRANCH_NAME}}:latest
+            jafarijason/${{env.REPO_NAME}}_${{ env.BRANCH_NAME}}:${{env.APP_VERSION}}
+      - name: Copy config file into server
+        uses: appleboy/scp-action@master
+        with:
+          source: deploy_${{ env.BRANCH_NAME }}.yml
+          target: /${{env.REPO_NAME}}_${{ env.BRANCH_NAME}}/${{env.APP_VERSION}}/
+          host: server.codevteacher.com
+          port: 22
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+
+      - name: connect to server and deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: server.codevteacher.com
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script: |
+            source ~/.zshrc && \
+            mkdir -p /${{env.REPO_NAME}}_${{ env.BRANCH_NAME}}/${{env.APP_VERSION}} && \
+            cd  /${{env.REPO_NAME}}_${{ env.BRANCH_NAME}}/${{env.APP_VERSION}} && \
+            touch /${{env.REPO_NAME}}_${{ env.BRANCH_NAME}}/${{env.APP_VERSION}}/.env && \
+            echo "APP_VERSION=${{ env.APP_VERSION }}" >>  /${{env.REPO_NAME}}_${{ env.BRANCH_NAME}}/${{env.APP_VERSION}}/.env && \
+            echo "APP_PORT=${{ env.APP_PORT }}" >>  /${{env.REPO_NAME}}_${{ env.BRANCH_NAME}}/${{env.APP_VERSION}}/.env && \
+            export APP_PORT=${{ env.APP_PORT }} && \
+            echo "APP_DOMAIN=${{ env.APP_DOMAIN }}" >>  /${{env.REPO_NAME}}_${{ env.BRANCH_NAME}}/${{env.APP_VERSION}}/.env && \
+            echo "BRANCH_NAME=${{ env.BRANCH_NAME }}" >>  /${{env.REPO_NAME}}_${{ env.BRANCH_NAME}}/${{env.APP_VERSION}}/.env && \
+            export $(xargs < .env) && \
+            export NODE_ID=$(docker info -f '{{.Swarm.NodeID}}') && \
+            docker stack deploy -c deploy_${{ env.BRANCH_NAME }}.yml ${{env.REPO_NAME}}_${{ env.BRANCH_NAME}}  --resolve-image=always --with-registry-auth --prune
