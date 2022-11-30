@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import {
     CButton,
@@ -14,9 +14,16 @@ import {
     CRow,
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilLockLocked, cilUser } from '@coreui/icons';
+import { cilLockLocked, cilLockUnlocked, cilUser } from '@coreui/icons';
+import { AppContext } from '../../../context/AppContext';
+import immutableSetState from '../../../context/immutableSetState';
+import usersLogin from '../../../services/users/usersLogin';
 
 const Login = () => {
+
+    const { appState } = useContext(AppContext);
+
+    const { login } = appState;
     return (
         <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
             <CContainer>
@@ -32,27 +39,77 @@ const Login = () => {
                                             <CInputGroupText>
                                                 <CIcon icon={cilUser} />
                                             </CInputGroupText>
-                                            <CFormInput placeholder="Username" autoComplete="username" />
+                                            <CFormInput
+                                                placeholder="Username"
+                                                autoComplete="username"
+                                                value={login?.username}
+                                                onChange={(event) => {
+                                                    const newUserName = event.target.value;
+                                                    immutableSetState((draft) => {
+                                                        draft.login.username = newUserName;
+                                                    });
+                                                }}
+                                            />
                                         </CInputGroup>
                                         <CInputGroup className="mb-4">
                                             <CInputGroupText>
                                                 <CIcon icon={cilLockLocked} />
                                             </CInputGroupText>
                                             <CFormInput
-                                                type="password"
+                                                type={
+                                                    login?.showPassword
+                                                        ? 'text'
+                                                        : 'password'
+                                                }
                                                 placeholder="Password"
                                                 autoComplete="current-password"
+                                                value={login?.password}
+                                                onChange={(event) => {
+                                                    const newPassword = event.target.value;
+                                                    immutableSetState((draft) => {
+                                                        draft.login.password = newPassword;
+                                                    });
+                                                }}
                                             />
+                                            <CButton
+                                                onClick={() => {
+                                                    immutableSetState((draft) => {
+                                                        draft.login.showPassword = !draft.login.showPassword;
+                                                    });
+                                                }}
+                                            >
+                                                {
+                                                    login?.showPassword
+                                                        ? <CIcon
+                                                            icon={cilLockUnlocked}
+                                                            size='sm'
+                                                        />
+                                                        : <CIcon
+                                                            icon={cilLockLocked}
+                                                            size='sm'
+                                                        />
+                                                }
+                                                {/* {
+                                                    !login?.showPassword
+                                                        ? 'show'
+                                                        : 'hide'
+                                                } */}
+                                            </CButton>
                                         </CInputGroup>
                                         <CRow>
                                             <CCol xs={6}>
-                                                <CButton color="primary" className="px-4">
-                          Login
+                                                <CButton
+                                                    color="primary" className="px-4"
+                                                    onClick={async () => {
+                                                        await usersLogin(login?.username, login?.password);
+                                                    }}
+                                                >
+                                                    Login
                                                 </CButton>
                                             </CCol>
                                             <CCol xs={6} className="text-right">
                                                 <CButton color="link" className="px-0">
-                          Forgot password?
+                                                    Forgot password?
                                                 </CButton>
                                             </CCol>
                                         </CRow>
@@ -64,12 +121,12 @@ const Login = () => {
                                     <div>
                                         <h2>Sign up</h2>
                                         <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                      tempor incididunt ut labore et dolore magna aliqua.
+                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                                            tempor incididunt ut labore et dolore magna aliqua.
                                         </p>
                                         <Link to="/register">
                                             <CButton color="primary" className="mt-3" active tabIndex={-1}>
-                        Register Now!
+                                                Register Now!
                                             </CButton>
                                         </Link>
                                     </div>
