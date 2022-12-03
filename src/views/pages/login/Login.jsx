@@ -18,10 +18,14 @@ import { cilLockLocked, cilLockUnlocked, cilUser } from '@coreui/icons';
 import { AppContext } from '../../../context/AppContext';
 import immutableSetState from '../../../context/immutableSetState';
 import usersLogin from '../../../services/users/usersLogin';
+import validateToken from '../../../services/users/validateToken';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
 
     const { appState } = useContext(AppContext);
+
+    const navigate = useNavigate();
 
     const { login } = appState;
     return (
@@ -102,6 +106,10 @@ const Login = () => {
                                                     color="primary" className="px-4"
                                                     onClick={async () => {
                                                         await usersLogin(login?.username, login?.password);
+                                                        const isAuthenticated = await validateToken();
+                                                        if (isAuthenticated) {
+                                                            navigate('/');
+                                                        }
                                                     }}
                                                 >
                                                     Login

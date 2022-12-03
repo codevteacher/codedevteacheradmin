@@ -1,7 +1,13 @@
 import { API_URL } from '../../configs/constants';
+import jwt_decode from 'jwt-decode';
+import _ from 'lodash';
+import isTEACHER from '../../commons/isTEACHER';
+import immutableSetState from '../../context/immutableSetState';
+
 
 const usersLogin = async (username, password) => {
-    debugger;
+
+    // eslint-disable-next-line no-useless-catch
     try {
         const usersLoginRaw = await fetch(`${API_URL}/users/login`, {
             method: 'post',
@@ -22,24 +28,37 @@ const usersLogin = async (username, password) => {
         if (!token) {
             throw new Error('not found token');
         }
-        // const decoded = jwt_decode(token);
-        // if (
-        //     !(
-        //         decoded[`${globalConstants.ROLE.CUSTOMER}`]
-        //     )
-        // ) {
-        //     throw new Error('can not login');
-        // }
-        // await setFix4Token(token);
+        const decoded = jwt_decode(token);
+        const ROLES = decoded?.ROLES;
+        const userId = decoded?.userId;
+        const userName = decoded?.username;
+
+        if (
+            !userName
+            || !userId
+            || _.isEmpty(ROLES)
+        ) {
+            throw new Error('User payload is not accepted');
+        }
+
+        const isTeacher = isTEACHER(ROLES);
+        if (!isTeacher) {
+            // TODO: make sure portal working for TAS
+            throw new Error('User is not authorized for using this portal');
+        }
+
+        immutableSetState((draft) => {
+            draft.login.tokenPayload.ROLES = ROLES;
+            draft.login.tokenPayload.userId = userId;
+            draft.login.tokenPayload.userName = userName;
+        });
+
+        await localStorage.setItem('CO_DEV_TEACHER_TOKEN_API', token);
+
         return;
     }
     catch (error) {
-        // immutableSetState((draft) => {
-        //     draft.login.errorMessage = error.message;
-        //     draft.login.isValid = false;
-        //     draft.login.disable = false;
-        // });
-        // throw new Error('Invalid email or password');
+        throw error;
     }
 };
 

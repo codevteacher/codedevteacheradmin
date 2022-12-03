@@ -1,7 +1,30 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppContent, AppSidebar, AppFooter, AppHeader } from '../components/index';
+import { AppContext } from '../context/AppContext';
+import validateToken from '../services/users/validateToken';
 
 const DefaultLayout = () => {
+
+    const navigate = useNavigate();
+    const { appState } = useContext(AppContext);
+
+    const { login } = appState;
+    const { authenticated } = login;
+
+    useEffect(() => {
+        if (!authenticated) {
+            (async () => {
+                const isAuthenticated = await validateToken();
+                if (!isAuthenticated) {
+                    navigate('/login');
+                }
+            })();
+        }
+
+    }, [authenticated]);
+
     return (
         <div>
             <AppSidebar />
