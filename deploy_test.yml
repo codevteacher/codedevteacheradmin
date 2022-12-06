@@ -9,8 +9,6 @@ services:
       - traefik-public
     env_file:
       - .env
-    environment:
-      - REACT_APP_API_URL=https://test.api.codevteacher.com
     deploy:
       mode: replicated
       restart_policy:
@@ -44,9 +42,6 @@ services:
       - /bin/bash
       - -c
       - |
-        echo $REACT_APP_API_URL \
-        REACT_APP_API_URL=$REACT_APP_API_URL \
-        source $REACT_APP_API_URL \
         ./node_modules/http-server/bin/http-server \
         ./build/ \
         --proxy http://localhost:${APP_PORT}\? \

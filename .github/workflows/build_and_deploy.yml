@@ -23,14 +23,17 @@ jobs:
         if: ${{env.BRANCH_NAME == 'prd'}}
         run: |
           echo "APP_PORT=3101" >> $GITHUB_ENV
+          echo "REACT_APP_API_URL=https://prd.api.codevteacher.com" >> $GITHUB_ENV
       - name: assign port for dev
         if: ${{env.BRANCH_NAME == 'dev'}}
         run: |
           echo "APP_PORT=3102" >> $GITHUB_ENV
+          echo "REACT_APP_API_URL=https://dev.api.codevteacher.com" >> $GITHUB_ENV
       - name: assign port for test
         if: ${{env.BRANCH_NAME == 'test'}}
         run: |
           echo "APP_PORT=3103" >> $GITHUB_ENV
+          echo "REACT_APP_API_URL=https://test.api.codevteacher.com" >> $GITHUB_ENV
       - name: Prepare APP_DOMAIN
         run: |
           echo "APP_DOMAIN=$( echo ${{ env.BRANCH_NAME }}).admin.codevteacher.com" >> $GITHUB_ENV
@@ -80,6 +83,8 @@ jobs:
             echo "APP_VERSION=${{ env.APP_VERSION }}" >>  /${{env.REPO_NAME}}_${{ env.BRANCH_NAME}}/${{env.APP_VERSION}}/.env && \
             echo "APP_PORT=${{ env.APP_PORT }}" >>  /${{env.REPO_NAME}}_${{ env.BRANCH_NAME}}/${{env.APP_VERSION}}/.env && \
             export APP_PORT=${{ env.APP_PORT }} && \
+            echo "REACT_APP_API_URL=${{ env.REACT_APP_API_URL }}" >>  /${{env.REPO_NAME}}_${{ env.BRANCH_NAME}}/${{env.APP_VERSION}}/.env && \
+            export REACT_APP_API_URL=${{ env.REACT_APP_API_URL }} && \
             echo "APP_DOMAIN=${{ env.APP_DOMAIN }}" >>  /${{env.REPO_NAME}}_${{ env.BRANCH_NAME}}/${{env.APP_VERSION}}/.env && \
             echo "BRANCH_NAME=${{ env.BRANCH_NAME }}" >>  /${{env.REPO_NAME}}_${{ env.BRANCH_NAME}}/${{env.APP_VERSION}}/.env && \
             export $(xargs < .env) && \
