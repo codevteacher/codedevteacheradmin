@@ -93,7 +93,6 @@ jobs:
             echo "APP_VERSION=${{ env.APP_VERSION }}" >>  /${{env.REPO_NAME}}_${{ env.BRANCH_NAME}}/${{env.APP_VERSION}}/.env && \
             echo "APP_PORT=${{ env.APP_PORT }}" >>  /${{env.REPO_NAME}}_${{ env.BRANCH_NAME}}/${{env.APP_VERSION}}/.env && \
             export APP_PORT=${{ env.APP_PORT }} && \
-            echo "REACT_APP_API_URL=${{ env.REACT_APP_API_URL }}" >>  /${{env.REPO_NAME}}_${{ env.BRANCH_NAME}}/${{env.APP_VERSION}}/.env && \
             export REACT_APP_API_URL=${{ env.REACT_APP_API_URL }} && \
             echo "APP_DOMAIN=${{ env.APP_DOMAIN }}" >>  /${{env.REPO_NAME}}_${{ env.BRANCH_NAME}}/${{env.APP_VERSION}}/.env && \
             echo "BRANCH_NAME=${{ env.BRANCH_NAME }}" >>  /${{env.REPO_NAME}}_${{ env.BRANCH_NAME}}/${{env.APP_VERSION}}/.env && \
