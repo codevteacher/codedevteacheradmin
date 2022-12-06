@@ -1,6 +1,6 @@
 {
   "name": "codedevteacheradmin",
-  "version": "1.0.13",
+  "version": "1.0.23",
   "description": "CoDevTeacher Admin Dashboard",
   "license": "MIT",
   "author": "Jason Jafari (https://www.linkedin.com/in/jasonjafari/)",
@@ -61,6 +61,9 @@
     "react-scripts": "^5.0.1",
     "sass": "^1.54.4",
     "web-vitals": "^2.1.4"
+  },
+  "overrides": {
+    "nth-check": "^2.0.1"
   },
   "engines": {
     "node": ">=10",

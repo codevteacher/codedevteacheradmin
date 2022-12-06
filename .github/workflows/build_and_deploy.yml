@@ -17,23 +17,36 @@ jobs:
       - name: Prepare environment (APP_VERSION, REPO_NAME, BRANCH_NAME)
         run: |
           echo "APP_VERSION=$(node printVersion.js)" >> $GITHUB_ENV
+          echo "APP_VERSION=$(node printVersion.js)" >> .env
           echo "REPO_NAME=$(echo ${GITHUB_REPOSITORY#*/})" >> $GITHUB_ENV
+          echo "REPO_NAME=$(echo ${GITHUB_REPOSITORY#*/})" >> .env
           echo "BRANCH_NAME=$(echo $GITHUB_REF | awk -F / '{print $3}')" >> $GITHUB_ENV
+          echo "BRANCH_NAME=$(echo $GITHUB_REF | awk -F / '{print $3}')" >> .env
       - name: assign port for prd
         if: ${{env.BRANCH_NAME == 'prd'}}
         run: |
           echo "APP_PORT=3101" >> $GITHUB_ENV
+          echo "APP_PORT=3101" >> .env
+          echo "REACT_APP_API_URL=https://prd.api.codevteacher.com" >> $GITHUB_ENV
+          echo "REACT_APP_API_URL=https://prd.api.codevteacher.com" >> .env
       - name: assign port for dev
         if: ${{env.BRANCH_NAME == 'dev'}}
         run: |
           echo "APP_PORT=3102" >> $GITHUB_ENV
+          echo "APP_PORT=3102" >> .env
+          echo "REACT_APP_API_URL=https://dev.api.codevteacher.com" >> $GITHUB_ENV
+          echo "REACT_APP_API_URL=https://dev.api.codevteacher.com" >> .env
       - name: assign port for test
         if: ${{env.BRANCH_NAME == 'test'}}
         run: |
           echo "APP_PORT=3103" >> $GITHUB_ENV
+          echo "APP_PORT=3103" >> .env
+          echo "REACT_APP_API_URL=https://test.api.codevteacher.com" >> $GITHUB_ENV
+          echo "REACT_APP_API_URL=https://test.api.codevteacher.com" >> .env
       - name: Prepare APP_DOMAIN
         run: |
           echo "APP_DOMAIN=$( echo ${{ env.BRANCH_NAME }}).admin.codevteacher.com" >> $GITHUB_ENV
+          echo "APP_DOMAIN=$( echo ${{ env.BRANCH_NAME }}).admin.codevteacher.com" >> .env
       - name: print environments
         run: |
           echo "${{ env.APP_VERSION }}"
