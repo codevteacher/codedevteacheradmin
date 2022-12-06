@@ -44,6 +44,9 @@ services:
       - /bin/bash
       - -c
       - |
+        echo $REACT_APP_API_URL \
+        REACT_APP_API_URL=$REACT_APP_API_URL \
+        source $REACT_APP_API_URL \
         ./node_modules/http-server/bin/http-server \
         ./build/ \
         --proxy http://localhost:${APP_PORT}\? \
