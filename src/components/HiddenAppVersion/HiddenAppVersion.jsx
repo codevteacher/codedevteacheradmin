@@ -7,7 +7,7 @@ const HiddenAppVersion = () => {
     const message = `${version}`;
 
     return (
-        <div id='fix4-version-hidden' style={{ display: 'none' }}  >
+        <div id='version-hidden' style={{ display: 'none' }}  >
             {message}
         </div>
     );
