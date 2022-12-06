@@ -5,10 +5,12 @@ import { createRoot } from 'react-dom/client';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import AppContextProvider from './context/AppContext';
+import HiddenAppVersion from './components/HiddenAppVersion/HiddenAppVersion';
 
 createRoot(document.getElementById('root')).render(
     <AppContextProvider>
         <App />
+        <HiddenAppVersion />
     </AppContextProvider>
 );
 
