@@ -9,6 +9,8 @@ services:
       - traefik-public
     env_file:
       - .env
+    environment:
+      - REACT_APP_API_URL=https://prd.api.codevteacher.com
     deploy:
       mode: replicated
       restart_policy:
