@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -14,25 +15,31 @@ import {
     CRow,
 } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
-import { cilLockLocked, cilLockUnlocked, cilUser } from '@coreui/icons';
+import { cilLockLocked, cilLockUnlocked } from '@coreui/icons';
 import { AppContext } from '../../../context/AppContext';
 import immutableSetState from '../../../context/immutableSetState';
-import usersLogin from '../../../services/users/usersLogin';
-import validateToken from '../../../services/users/validateToken';
 import { useNavigate } from 'react-router-dom';
+import { passwordStrength } from 'check-password-strength';
+import { useSearchParams } from 'react-router-dom';
+import resetPasswordHandle from '../../../services/users/resetPasswordHandle';
 
-import * as EmailValidator from 'email-validator';
-import resetPassword from '../../../services/users/resetPassword';
 
 
 
-const Login = () => {
+const ResetPassword = () => {
 
+    let [searchParams] = useSearchParams();
+    const resetPasswordUid = searchParams.get('repui');
     const { appState } = useContext(AppContext);
 
     const navigate = useNavigate();
 
     const { login } = appState;
+
+
+    const passwordCheck = passwordStrength(login?.password).value;
+
+
     return (
         <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
             <CContainer>
@@ -42,24 +49,7 @@ const Login = () => {
                             <CCard className="p-4">
                                 <CCardBody>
                                     <CForm>
-                                        <h1>Login</h1>
-                                        <p className="text-medium-emphasis">Sign In to your account</p>
-                                        <CInputGroup className="mb-3">
-                                            <CInputGroupText>
-                                                <CIcon icon={cilUser} />
-                                            </CInputGroupText>
-                                            <CFormInput
-                                                placeholder="Username"
-                                                autoComplete="username"
-                                                value={login?.username}
-                                                onChange={(event) => {
-                                                    const newUserName = event.target.value;
-                                                    immutableSetState((draft) => {
-                                                        draft.login.username = newUserName;
-                                                    });
-                                                }}
-                                            />
-                                        </CInputGroup>
+                                        <h1>ResetPassword</h1>
                                         <CInputGroup className="mb-4">
                                             <CInputGroupText>
                                                 <CIcon icon={cilLockLocked} />
@@ -105,39 +95,61 @@ const Login = () => {
                                                 } */}
                                             </CButton>
                                         </CInputGroup>
+                                        <CInputGroup className="mb-4">
+                                            <CInputGroupText>
+                                                <CIcon icon={cilLockLocked} />
+                                            </CInputGroupText>
+                                            <CFormInput
+                                                type={
+                                                    login?.showPassword
+                                                        ? 'text'
+                                                        : 'password'
+                                                }
+                                                placeholder="Re Enter Password"
+                                                autoComplete="current-password"
+                                                value={login?.passwordConfirm}
+                                                onChange={(event) => {
+                                                    const newPassword = event.target.value;
+                                                    immutableSetState((draft) => {
+                                                        draft.login.passwordConfirm = newPassword;
+                                                    });
+                                                }}
+                                            />
+                                        </CInputGroup>
                                         <CRow>
-                                            <CCol xs={6}>
+                                            {
+                                                login?.password
+                                                && passwordCheck
+                                            }
+                                        </CRow>
+                                        <CRow>
+                                            <CCol >
                                                 <CButton
-                                                    color="primary" className="px-4"
+                                                    color="warning" className="px-4"
                                                     onClick={async () => {
-                                                        await usersLogin(login?.username, login?.password);
-                                                        const isAuthenticated = await validateToken();
-                                                        if (isAuthenticated) {
-                                                            navigate('/');
+                                                        const isPasswordChanged = await resetPasswordHandle(resetPasswordUid, login?.password);
+                                                        if (isPasswordChanged?.message == 'password updated successfully') {
+                                                            navigate('/login');
                                                         }
                                                     }}
-                                                >
-                                                    Login
-                                                </CButton>
-                                            </CCol>
-                                            <CCol xs={6} className="text-right">
-                                                <CButton
-                                                    color="link" className="px-0"
-                                                    onClick={async () => {
-                                                        await resetPassword(login?.username);
-                                                    }}
-                                                >
-                                                    {
-                                                        EmailValidator.validate(login?.username)
-                                                        && 'Forgot password?'
+                                                    disabled={
+                                                        !(
+                                                            login?.password
+                                                            && resetPasswordUid
+                                                            && login?.passwordConfirm
+                                                            && login?.password == login?.passwordConfirm
+                                                            && !['Too weak', 'Weak'].includes(passwordCheck)
+                                                        )
                                                     }
+                                                >
+                                                    Reset Password
                                                 </CButton>
                                             </CCol>
                                         </CRow>
                                     </CForm>
                                 </CCardBody>
                             </CCard>
-                            <CCard className="text-white bg-primary py-5" style={{ width: '44%' }}>
+                            <CCard className="text-white bg-warning py-5" style={{ width: '44%' }}>
                                 <CCardBody className="text-center">
                                     <div>
                                         <h2>Sign up</h2>
@@ -146,7 +158,7 @@ const Login = () => {
                                             tempor incididunt ut labore et dolore magna aliqua.
                                         </p>
                                         <Link to="/register">
-                                            <CButton color="primary" className="mt-3" active tabIndex={-1}>
+                                            <CButton color="warning" className="mt-3" active tabIndex={-1}>
                                                 Register Now!
                                             </CButton>
                                         </Link>
@@ -161,4 +173,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default ResetPassword;
